@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="反応時間とカーソル同期を友達と試す、独立オンライン試験">
+  <title>ゆっくりにはなりたくない！ | ONLINE LAB</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+  <header><a href="/" class="brand">YUKKURI <span>ONLINE LAB</span></a><span id="connection" role="status">未接続</span></header>
+  <section id="entrance" class="entrance">
+    <div><p class="eyebrow">ゆっくりにはなりたくない！ / 通信の実験室</p><h1>その一瞬を、<br>みんなで試そう。</h1><p class="intro">合図で押す。カーソルで遊ぶ。<br>離れた友達と、反応と通信の違いを見つける。</p></div>
+    <form id="join-form" class="panel">
+      <h2>試験に参加</h2>
+      <label>名前<input id="name" required maxlength="20" autocomplete="nickname" placeholder="例：プレイヤー"></label>
+      <label>部屋コード<input id="room-code" maxlength="32" autocomplete="off" placeholder="新しい部屋なら空欄"></label>
+      <button id="join-button" type="submit">部屋をつくる / 参加する <span>→</span></button>
+      <p>2〜8人。友達との本試験は3〜8人で。</p>
+    </form>
+  </section>
+  <section id="lab" hidden>
+    <div class="room-bar"><div><p class="eyebrow">REACTION + CURSOR SYNC</p><h1>みんなの実験室</h1></div><div class="room-actions"><button id="invite" class="secondary">招待URLをコピー</button><button id="export" class="secondary">結果を保存</button><button id="leave" class="quiet">退出</button></div></div>
+    <div class="layout">
+      <div class="play-column">
+        <div class="metrics"><span>RTT <b id="rtt">—</b> ms</span><span>時計推定 ±<b id="uncertainty">—</b> ms</span><span>描画間隔 <b id="frame">—</b> ms</span><span>他カーソル経過 <b id="cursor-age">—</b> ms</span></div>
+        <div id="arena" class="arena" tabindex="0" aria-label="カーソル同期の試験盤面">
+          <div class="arena-grid"></div><span class="corner top">1000 × 680</span><span class="corner bottom">CURSOR SYNC / 20 Hz</span>
+          <div class="signal-area"><div id="signal-label" class="eyebrow">まずはカーソルを動かそう</div><button id="target" class="target" aria-label="合図の後に押す"><span id="target-text">待機</span></button><p id="round-status">全員が準備できたらスタート</p></div>
+          <div id="cursors" aria-hidden="true"></div>
+        </div>
+        <div class="under-arena"><span>押す操作：中央ボタン / Space</span><label class="check"><input id="smooth" type="checkbox" checked> 100 ms 補間</label></div>
+        <section class="results panel"><div class="section-title"><h2>今回の結果</h2><span id="round-number">—</span></div><div id="results"><p>合図の後に押すと、ここに結果が出ます。</p></div></section>
+      </div>
+      <aside class="panel controls">
+        <div class="section-title"><h2>参加者</h2><span id="player-count">0 / 8</span></div><ul id="players"></ul>
+        <button id="ready">準備完了</button>
+        <div id="host-controls"><label>同着にする差<select id="tie"><option value="0">0 ms</option><option value="10" selected>10 ms</option><option value="30">30 ms</option><option value="80">80 ms（本編案との比較）</option></select></label><button id="start" class="secondary">試験をスタート</button></div>
+        <p id="help">時計を同期しています…</p>
+      </aside>
+    </div>
+  </section>
+  <p id="notice" role="status" aria-live="polite"></p>
+  <details class="method"><summary>この試験で測るもの・測れないもの</summary><p>反応時間は、各端末で「合図を描画する処理を行った時刻」から「入力ハンドラーを呼び出した時刻」までを performance.now() で計測します。画面が実際に発光した時刻や、スイッチの物理的な接点時刻は測れません。</p><p>RTT はサーバーとの往復時間です。反応時間から RTT を引きません。合図は事前に予定時刻を配り、時計の推定値で表示します。時計推定の ± 値は最小RTTの半分を目安とした値で、誤差の保証ではありません。</p><p>端末の表示・入力遅延、回線の非対称、予定時刻を知ること、ホストのサーバー操作、クライアント改ざんによる有利は残ります。ホスト公平性や不正防止は保証しません。友達との技術検証用です。</p><p>合図の予定受信が遅い、描画が80ms超遅い、描画間隔が100ms超、タブ非表示・フォーカス喪失、切断、時計同期が古い、早押し、5秒以内に応答なし、などは無効にします。接続や描画に大きな異常があればその回をやり直してください。</p><p>カーソルは同じ縦横比の盤面で位置を0〜1に正規化し、最大20Hzで送ります。他人の表示は100ms分バッファーして補間。通信時間も加わるため、本編の取得判定をそのまま検証するものではありません。秘密の手札・妨害・コイン取得は未実装です。</p></details>
+  <footer>独立プロトタイプ / 本編への統合なし</footer>
+</main>
+<script type="module" src="/app.mjs"></script>
+</body>
+</html>
